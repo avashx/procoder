@@ -201,6 +201,7 @@
   <div class="container">
     <h1>Wi-Fi Setup</h1>
     <div class="saved-wifi" id="savedWiFi">Saved Wi-Fi: Loading...</div>
+    <div class="saved-wifi" id="mode">Mode: Loading...</div>
     <select id="ssid" onchange="updateSSID()" aria-label="Select Wi-Fi network">
       <option value="">Select a Wi-Fi network</option>
     </select>
@@ -235,20 +236,42 @@
         return;
       }
       document.getElementById('status').textContent = 'Connecting...';
-      try {
-        const data = { endpoint: '/connect-wifi', ssid, password };
-        ws.send(JSON.stringify(data));
-      } catch (error) {
-        document.getElementById('status').textContent = 'Error connecting to Wi-Fi';
-        console.error('Wi-Fi connect error:', error);
+      if (window.location.host.includes('procoders.vercel.app')) {
+        try {
+          ws.send(JSON.stringify({ endpoint: '/connect-wifi', ssid, password }));
+        } catch (error) {
+          document.getElementById('status').textContent = 'Error connecting to Wi-Fi';
+          console.error('Wi-Fi connect error:', error);
+        }
+      } else {
+        try {
+          const response = await fetch('/connect-wifi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `ssid=${encodeURIComponent(ssid)}&password=${encodeURIComponent(password)}`
+          });
+          const result = await response.json();
+          if (result.status === 'connected') {
+            document.getElementById('status').textContent = `Connected! IP: ${result.ip}`;
+            document.getElementById('savedWiFi').textContent = `Saved Wi-Fi: ${result.ssid}`;
+            document.getElementById('mode').textContent = `Mode: Client (${result.ip})`;
+            setTimeout(() => window.location.href = '/', 2000);
+          } else {
+            document.getElementById('status').textContent = 'Failed to connect. Please try again.';
+          }
+        } catch (error) {
+          document.getElementById('status').textContent = 'Error connecting to Wi-Fi';
+          console.error('Wi-Fi connect error:', error);
+        }
       }
     }
 
     function connectWebSocket() {
-      ws = new WebSocket('wss://' + window.location.host);
+      ws = new WebSocket('wss://' + window.location.host + '/api/websocket');
       ws.onopen = () => {
         console.log('WebSocket connected');
         ws.send(JSON.stringify({ endpoint: '/wifi-scan' }));
+        ws.send(JSON.stringify({ endpoint: '/saved-wifi' }));
       };
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -262,12 +285,14 @@
           if (data.status === 'connected') {
             document.getElementById('status').textContent = `Connected! IP: ${data.ip}`;
             document.getElementById('savedWiFi').textContent = `Saved Wi-Fi: ${data.ssid}`;
+            document.getElementById('mode').textContent = `Mode: Client (${data.ip})`;
             setTimeout(() => window.location.href = '/', 2000);
           } else {
             document.getElementById('status').textContent = 'Failed to connect. Please try again.';
           }
         } else if (data.endpoint === '/saved-wifi') {
           document.getElementById('savedWiFi').textContent = `Saved Wi-Fi: ${data.ssid || 'None'}`;
+          document.getElementById('mode').textContent = `Mode: ${data.isAPMode ? 'Access Point (192.168.4.1)' : 'Client (' + data.ip + ')'}`;
         }
       };
       ws.onclose = () => {
@@ -279,7 +304,11 @@
 
     window.onload = () => {
       loadTheme();
-      connectWebSocket();
+      if (window.location.host.includes('procoders.vercel.app')) {
+        connectWebSocket();
+      } else {
+        document.getElementById('mode').textContent = 'Mode: Access Point (192.168.4.1)';
+      }
     };
   </script>
 </body>
