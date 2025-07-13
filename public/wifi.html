@@ -1,1 +1,286 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wi-Fi Setup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #F9FAFB;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #1F2937;
+      min-height: 100vh;
+    }
+    body.dark-theme {
+      background-color: #111827;
+      color: #FBBF24;
+    }
+    .container {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .nav-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav {
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #FFFFFF;
+      padding: 8px 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 420px;
+    }
+    body.dark-theme nav {
+      background-color: #1F2937;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+    }
+    nav a {
+      color: #1F2937;
+      text-decoration: none;
+      font-size: 16px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.3s;
+    }
+    body.dark-theme nav a {
+      color: #FBBF24;
+    }
+    nav a:hover {
+      background: #FBBF2444;
+    }
+    body.dark-theme nav a:hover {
+      background: #FBBF2422;
+    }
+    nav a.active {
+      border: 2px solid #FBBF24;
+      padding: calc(8px - 2px) calc(16px - 2px);
+    }
+    body.dark-theme nav a.active {
+      border-color: #FBBF24;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 40px;
+      height: 20px;
+      background-color: #D1D5DB;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    body.dark-theme .toggle-switch {
+      background-color: #4B5563;
+    }
+    .toggle-switch::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background-color: #FBBF24;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+    }
+    body.dark-theme .toggle-switch::before {
+      transform: translateX(20px);
+    }
+    h1 {
+      font-size: 24px;
+      margin: 8px 0;
+      text-align: center;
+      font-weight: 700;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #FBBF24;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #FFFFFF;
+      color: #1F2937;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+    body.dark-theme select {
+      background-color: #1F2937;
+      color: #FBBF24;
+      border-color: #FBBF24;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #FBBF24;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #FFFFFF;
+      color: #1F2937;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+    body.dark-theme input[type="text"], body.dark-theme input[type="password"] {
+      background-color: #1F2937;
+      color: #FBBF24;
+      border-color: #FBBF24;
+    }
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #FBBF24;
+      color: #1F2937;
+      width: 100%;
+      transition: background 0.2s, transform 0.2s;
+    }
+    body.dark-theme button {
+      background: #FBBF24;
+      color: #1F2937;
+    }
+    button:hover:not(:disabled) {
+      background: #D97706;
+      transform: translateY(-2px);
+    }
+    body.dark-theme button:hover:not(:disabled) {
+      background: #D97706;
+    }
+    #status {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+      color: #1F2937;
+      transition: color 0.3s;
+    }
+    body.dark-theme #status {
+      color: #FBBF24;
+    }
+    .saved-wifi {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #1F2937;
+      transition: color 0.3s;
+    }
+    body.dark-theme .saved-wifi {
+      color: #FBBF24;
+    }
+  </style>
+</head>
+<body class="light-theme">
+  <div class="nav-container">
+    <nav class="navbar">
+      <div class="nav-links">
+        <a href="/" aria-label="Main page">Main</a>
+        <a href="/wifi" class="active" aria-label="Wi-Fi setup">Wi-Fi</a>
+      </div>
+      <div class="toggle-switch" onclick="toggleTheme()" aria-label="Toggle theme"></div>
+    </nav>
+  </div>
+  <div class="container">
+    <h1>Wi-Fi Setup</h1>
+    <div class="saved-wifi" id="savedWiFi">Saved Wi-Fi: Loading...</div>
+    <select id="ssid" onchange="updateSSID()" aria-label="Select Wi-Fi network">
+      <option value="">Select a Wi-Fi network</option>
+    </select>
+    <input type="password" id="password" placeholder="Enter Wi-Fi password" aria-label="Wi-Fi password">
+    <button onclick="connectWiFi()" aria-label="Connect to Wi-Fi">Connect</button>
+    <div id="status"></div>
+  </div>
+  <script>
+    let ws;
+
+    function loadTheme() {
+      const theme = localStorage.getItem('theme') || 'light';
+      document.body.classList.toggle('dark-theme', theme === 'dark');
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark-theme');
+      const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+    }
+
+    function updateSSID() {
+      document.getElementById('password').value = '';
+      document.getElementById('status').textContent = '';
+    }
+
+    async function connectWiFi() {
+      const ssid = document.getElementById('ssid').value;
+      const password = document.getElementById('password').value;
+      if (!ssid) {
+        document.getElementById('status').textContent = 'Please select a Wi-Fi network';
+        return;
+      }
+      document.getElementById('status').textContent = 'Connecting...';
+      try {
+        const data = { endpoint: '/connect-wifi', ssid, password };
+        ws.send(JSON.stringify(data));
+      } catch (error) {
+        document.getElementById('status').textContent = 'Error connecting to Wi-Fi';
+        console.error('Wi-Fi connect error:', error);
+      }
+    }
+
+    function connectWebSocket() {
+      ws = new WebSocket('wss://' + window.location.host);
+      ws.onopen = () => {
+        console.log('WebSocket connected');
+        ws.send(JSON.stringify({ endpoint: '/wifi-scan' }));
+      };
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.endpoint === '/wifi-scan') {
+          const ssidSelect = document.getElementById('ssid');
+          ssidSelect.innerHTML = '<option value="">Select a Wi-Fi network</option>';
+          data.networks.forEach(network => {
+            ssidSelect.innerHTML += `<option value="${network.ssid}">${network.ssid} (${network.rssi} dBm)</option>`;
+          });
+        } else if (data.endpoint === '/connect-wifi') {
+          if (data.status === 'connected') {
+            document.getElementById('status').textContent = `Connected! IP: ${data.ip}`;
+            document.getElementById('savedWiFi').textContent = `Saved Wi-Fi: ${data.ssid}`;
+            setTimeout(() => window.location.href = '/', 2000);
+          } else {
+            document.getElementById('status').textContent = 'Failed to connect. Please try again.';
+          }
+        } else if (data.endpoint === '/saved-wifi') {
+          document.getElementById('savedWiFi').textContent = `Saved Wi-Fi: ${data.ssid || 'None'}`;
+        }
+      };
+      ws.onclose = () => {
+        console.log('WebSocket disconnected, reconnecting...');
+        setTimeout(connectWebSocket, 2000);
+      };
+      ws.onerror = (error) => console.error('WebSocket error:', error);
+    }
+
+    window.onload = () => {
+      loadTheme();
+      connectWebSocket();
+    };
+  </script>
+</body>
+</html>
