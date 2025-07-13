@@ -1,0 +1,15 @@
+{
+  "name": "procoder",
+  "version": "1.0.0",
+  "description": "Web app for NSUT ke Pro Coder",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
